@@ -1,0 +1,55 @@
+clear all
+clc
+
+x = 0.1:1/22:1;
+d = ((1 + 0.6*sin(2*pi*x/0.7)) + 0.3*sin(2*pi*x))/2;
+
+figure(1)
+plot(x, d, "kx")
+hold on; grid on;
+
+% Isugeneruojami atsitiktinai svoriai
+w0 = randn(1);
+w1 = randn(1);
+w2 = randn(1);
+
+c1 = 0.20;
+c2 = 0.8;
+r1 = 0.15;
+r2 = 0.15;
+
+S = 0.15; % Mokymosi žingsnis
+
+% Mokomas neuroninis tinklas 1000 epochų
+for k = 1:10000
+    % Einama per iekvieną duomenų tašką
+    for n = 1:20
+        % Apskaičiuojamos dvejų neuronų Gauso aktyvavimo funkcijos
+        F1 = exp(-((x(n) - c1)^2) / (2 * (r1^2)));
+        F2 = exp(-((x(n) - c2)^2) / (2 * (r2^2)));
+        % Apskaičiuojama neuroninio tinklo išvestis
+        y(n) = F1 * w1 + F2 * w2 + w0;
+        % Apskaičiuojama klaida
+        e = d(n) - y(n);
+        % Atnaujinami svoriai
+        w1 = w1 + S * e * F1;
+        w2 = w2 + S * e * F2;
+        w0 = w0 + S * e;
+    end
+end
+ 
+%Tikrinama kaip apsimokė tinklas
+x_new = 0.1:0.01:1;
+for i = 1:length(x_new)
+    F1_new = exp(-((x_new(i) - c1)^2) / (2 * (r1^2)));
+    F2_new = exp(-((x_new(i) - c2)^2) / (2 * (r2^2)));
+    y_new(i) = F1_new * w1 + F2_new * w2 + w0;
+end
+
+% Nubraižoma apmokyto tinklo funkcija
+figure(2)
+plot(x_new, y_new, 'b-', x, d, 'kx')
+hold on; grid on;
+
+
+
